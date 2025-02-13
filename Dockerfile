@@ -34,4 +34,3 @@ EXPOSE 8080
 
 # Use the entrypoint script to start the app
 ENTRYPOINT ["/app/entrypoint.sh"]
-``
