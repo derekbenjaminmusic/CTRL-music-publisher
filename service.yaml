@@ -1,0 +1,37 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: ctrl-music-publisher
+  namespace: default
+spec:
+  template:
+    spec:
+      containers:
+        - image: gcr.io/ctrl-catalogue/ctrl-music-publisher:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DJANGO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: django-secret
+                  key: DJANGO_SECRET_KEY
+            - name: DJANGO_DEBUG
+              value: "false"
+            - name: DJANGO_ALLOWED_HOSTS
+              value: "ctrl-catalogue-6azjnskd6q-uc.a.run.app,localhost"
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: cloudsql-db-url
+                  key: DATABASE_URL
+            - name: GS_BUCKET_NAME
+              value: "ctrl-music-static-files"
+          volumeMounts:
+            - name: cloudsql-instance-credentials
+              mountPath: /cloudsql
+              readOnly: true
+      volumes:
+        - name: cloudsql-instance-credentials
+          secret:
+            secretName: cloudsql-instance-credentials
